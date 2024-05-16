@@ -1,4 +1,4 @@
-# Welcome to GPT-4o-Tutorials
+# Welcome to OpenAI GPT-4o Tutorials
 
 [![](https://img.shields.io/badge/python-darkblue?&style=plastic&logo=python&logoColor=white)]()
 [![](https://img.shields.io/badge/openai-darkgreen?&style=plastic&logo=openai&logoColor=white)]()
