@@ -1,4 +1,9 @@
 # Welcome to GPT-4o-Tutorials
+
+[![](https://img.shields.io/badge/python-darkblue?&style=plastic&logo=python&logoColor=white)]()
+[![](https://img.shields.io/badge/openai-darkgreen?&style=plastic&logo=openai&logoColor=white)]()
+[![](https://img.shields.io/badge/GPT4o-darkred?&style=plastic&logo=gpt&logoColor=white)]()
+
 This repo includes hands-on projects with GPT-4o.
 
 ### YouTube Videos
