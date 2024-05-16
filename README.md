@@ -5,7 +5,7 @@ This repo includes hands-on projects with GPT-4o.
 
 - [Getting Started with GPT-4o API for Beginners](https://youtu.be/gpYCYGOQ3Co)
 
-<a href="https://youtu.be/gpYCYGOQ3Co" target="_blank"><img src="https://github.com/TirendazAcademy/GPT-4o-Tutorials/blob/main/Images/gpt-4o-tirendaz.png" alt="IMAGE ALT TEXT HERE" width="640" height="480" border="10" /></a>
+<a href="https://youtu.be/gpYCYGOQ3Co" target="_blank"><img src="https://github.com/TirendazAcademy/GPT-4o-Tutorials/blob/main/Images/gpt-4o-tirendaz.png" alt="IMAGE ALT TEXT HERE" width="360" height="270" border="10" /></a>
 
 
 
