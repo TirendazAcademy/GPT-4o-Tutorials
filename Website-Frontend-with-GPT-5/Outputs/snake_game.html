@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neon Snake • Siberpunk Yılan Oyunu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --panel: rgba(0,0,0,0.5);
+      --text: #e8f0ff;
+      --neonA: #00f5ff;
+      --neonB: #7bff4d;
+      --food: #ff2df7;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(20,12,60,.4), rgba(0,0,0,.9) 40%),
+                  linear-gradient(#050512, #000);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue";
+      overflow: hidden;
+    }
+
+    header {
+      position: fixed;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    h1 {
+      font-family: "Orbitron", "Audiowide", sans-serif;
+      font-weight: 900;
+      letter-spacing: 2px;
+      font-size: clamp(28px, 5vw, 64px);
+      color: #e6f8ff;
+      text-shadow: 0 0 6px rgba(0,255,255,.9), 0 0 14px rgba(0,255,255,.6);
+      margin: 0;
+      text-transform: uppercase;
+      line-height: 1;
+      mix-blend-mode: screen;
+    }
+
+    .subtitle {
+      font-family: "Orbitron", sans-serif;
+      font-size: clamp(12px, 2vw, 14px);
+      color: #aeefff;
+      opacity: .9;
+      text-shadow: 0 0 6px rgba(0,255,255,.6);
+      margin-top: 6px;
+    }
+
+    #gameCanvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      /* canvas üzerinde neon etkisini yumuşatır */
+      image-rendering: crisp-edges;
+      border: 0;
+    }
+
+    #hud {
+      position: fixed;
+      top: 8px;
+      right: 12px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.45);
+      color: #c8f4ff;
+      font-family: "Orbitron", sans-serif;
+      font-size: 14px;
+      z-index: 4;
+      text-shadow: 0 0 8px rgba(0,255,255,.8);
+      border: 1px solid rgba(0,255,255,.6);
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 6;
+      color: #eaffff;
+      font-family: "Orbitron", sans-serif;
+      text-align: center;
+      padding: 20px;
+      box-shadow: inset 0 0 60px rgba(0,255,255,.3);
+      display: none;
+    }
+
+    .overlayCard {
+      background: linear-gradient(135deg, rgba(20,0,40,.9), rgba(0,0,0,.9));
+      border-radius: 20px;
+      padding: 28px 28px 20px;
+      border: 1px solid rgba(0,255,255,.75);
+      max-width: 520px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(0,255,255,.6);
+      backdrop-filter: blur(2px);
+    }
+
+    #overlay h2 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #aaffff;
+      text-shadow: 0 0 12px rgba(0,255,255,.9);
+    }
+
+    #overlay p {
+      margin: 6px 0 18px;
+    }
+
+    .btn {
+      cursor: pointer;
+      padding: 12px 18px;
+      font-family: "Audiowide", "Orbitron", sans-serif;
+      background: linear-gradient(#00f7ff, #007dff);
+      border: 0;
+      border-radius: 10px;
+      color: #001018;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      box-shadow: 0 0 12px rgba(0,255,255,.9);
+    }
+
+    /* Dokunmatik butonlar için basit D-Pad (opsiyonel, görünüm için) */
+    #dpad {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(3, 56px);
+      grid-template-rows: 56px 56px 56px;
+      gap: 6px;
+      z-index: 4;
+      user-select: none;
+    }
+    .padBtn {
+      width: 56px; height: 56px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.5);
+      border: 1px solid rgba(0,255,255,.6);
+      display: grid; place-items: center;
+      color: #fff;
+      font-family: "Orbitron", sans-serif;
+      font-size: 18px;
+      text-shadow: 0 0 6px rgba(0,255,255,.8);
+      box-shadow: 0 0 12px rgba(0,255,255,.6);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>NEON SNAKE</h1>
+    <div class="subtitle">Futuristik neon siberpunk yılan oyunu • Tipografi havalı</div>
+  </header>
+
+  <canvas id="gameCanvas" aria-label="Neon Snake Oyunu"></canvas>
+  <div id="hud">Skor: 0</div>
+
+  <div id="overlay" role="dialog" aria-label="Oyun Sonu">
+    <div class="overlayCard">
+      <h2>OYUN BİTTİ</h2>
+      <p>Skor: <strong id="finalScore">0</strong></p>
+      <button class="btn" id="restartBtn">Yeniden Başlat</button>
+    </div>
+  </div>
+
+  <!-- Dokunmatik D-Pad (isteğe bağlı) -->
+  <div id="dpad" aria-hidden="true">
+    <div class="padBtn" data-dir="up">▲</div>
+    <div class="padBtn" data-dir="left" style="visibility:hidden"></div>
+    <div class="padBtn" data-dir="down" style="visibility:hidden">▼</div>
+    <div class="padBtn" data-dir="left">◀</div>
+    <div class="padBtn" style="visibility:hidden"></div>
+    <div class="padBtn" data-dir="right">▶</div>
+  </div>
+
+  <script>
+    (function() {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const hud = document.getElementById('hud');
+      const overlay = document.getElementById('overlay');
+      const finalScoreEl = document.getElementById('finalScore');
+      const restartBtn = document.getElementById('restartBtn');
+      const dpad = document.getElementById('dpad');
+
+      let cell = 24;
+      let cols = 0, rows = 0;
+      let snake = [];
+      let dir = {x:1, y:0};     // current direction
+      let nextDir = {x:1, y:0}; // enqueued direction
+      let food = {x:0, y:0};
+      let score = 0;
+      let running = false;
+      let gameOver = false;
+
+      let tick = 140; // ms per step, speed scales with score
+      let lastTime = 0;
+      let accumulator = 0;
+
+      function resize() {
+        // tam genişlik/yükseklik
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+
+        // canvas boyutları cihazla uyumlu
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        // gerçek piksel boyutu
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+
+        // grid boyutunu yeniden hesapla
+        // max 40x40 birim olacak şekilde dinamik
+        cell = Math.max(12, Math.min(40, Math.floor(Math.min(w, h) / 22)));
+        cols = Math.floor(w / cell);
+        rows = Math.floor(h / cell);
+      }
+
+      window.addEventListener('resize', () => {
+        resize();
+        // yeniden başlatmayı önlemek için mevcut oyun bozulmasın
+        // ama boyut değiştiğinde oyunu resetlemek en güvenlisi
+        // resetGame();
+      });
+
+      function randInt(n) { return Math.floor(Math.random() * n); }
+
+      function placeFood() {
+        // boş bir hücre bul
+        const empties = [];
+        for (let x = 0; x < cols; x++) {
+          for (let y = 0; y < rows; y++) {
+            if (!snake.some(s => s.x === x && s.y === y)) empties.push({x, y});
+          }
+        }
+        if (empties.length === 0) return; // tam dolu (oyun bitti)
+        const idx = randInt(empties.length);
+        food = empties[idx];
+      }
+
+      function resetGame() {
+        // başlangıç konumu
+        const startX = Math.max(2, Math.floor(cols * 0.25));
+        const startY = Math.floor(rows / 2);
+        snake = [];
+        for (let i = 0; i < 5; i++) {
+          snake.push({x: startX - i, y: startY});
+        }
+        dir = {x: 1, y: 0};
+        nextDir = {x: 1, y: 0};
+        score = 0;
+        tick = 140;
+        placeFood();
+        running = true;
+        gameOver = false;
+        overlay.style.display = 'none';
+        updateHUD(true);
+      }
+
+      function endGame() {
+        running = false;
+        gameOver = true;
+        finalScoreEl.textContent = String(score);
+        overlay.style.display = 'flex';
+      }
+
+      function updateHUD(force) {
+        hud.textContent = 'Skor: ' + score;
+      }
+
+      function update(dt) {
+        if (!running) return;
+        // yön değiştirmeyi uygula
+        if (nextDir.x !== 0 || nextDir.y !== 0) {
+          // zıt yön engelle
+          if (!(dir.x + nextDir.x === 0 && dir.y + nextDir.y === 0)) {
+            dir = {x: nextDir.x, y: nextDir.y};
+          }
+          nextDir = {x: 0, y: 0};
+        }
+
+        const head = snake[0];
+        const newHead = {x: head.x + dir.x, y: head.y + dir.y};
+
+        // sınırları aşma
+        if (newHead.x < 0 || newHead.y < 0 || newHead.x >= cols || newHead.y >= rows) {
+          endGame();
+          return;
+        }
+
+        // kendine çarpma
+        if (snake.some(s => s.x === newHead.x && s.y === newHead.y)) {
+          endGame();
+          return;
+        }
+
+        snake.unshift(newHead);
+
+        // yemek alındı mı?
+        const ate = (newHead.x === food.x && newHead.y === food.y);
+        if (ate) {
+          score++;
+          placeFood();
+          // hız artışı
+          tick = Math.max(60, tick - 6);
+          updateHUD(true);
+        } else {
+          snake.pop();
+        }
+      }
+
+      function draw() {
+        // arka plan
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+
+        // Neon grid arkaplan
+        ctx.save();
+        ctx.fillStyle = '#0a0a0f';
+        ctx.fillRect(0, 0, w, h);
+        // hafif neon grid
+        ctx.lineWidth = 1;
+        for (let x = 0; x <= cols; x++) {
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(0,255,255,0.05)';
+          ctx.moveTo(x * cell, 0);
+          ctx.lineTo(x * cell, rows * cell);
+          ctx.stroke();
+        }
+        for (let y = 0; y <= rows; y++) {
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(0,255,255,0.05)';
+          ctx.moveTo(0, y * cell);
+          ctx.lineTo(cols * cell, y * cell);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // yemek (glow)
+        const fx = food.x * cell + cell / 2;
+        const fy = food.y * cell + cell / 2;
+        const r = cell * 0.38;
+        const foodGrad = ctx.createRadialGradient(fx, fy, 2, fx, fy, r * 2);
+        foodGrad.addColorStop(0, '#ff2df7');
+        foodGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = foodGrad;
+        ctx.shadowBlur = 40;
+        ctx.shadowColor = '#ff2df7';
+        ctx.beginPath();
+        ctx.arc(fx, fy, r * 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // yılan (neon glow per segment)
+        for (let i = 0; i < snake.length; i++) {
+          const s = snake[i];
+          const px = s.x * cell;
+          const py = s.y * cell;
+          const glow = i === 0 ? 28 : 18;
+          ctx.fillStyle = i === snake.length - 1 ? '#00ffe0' : '#00d6ff';
+          ctx.shadowBlur = glow;
+          ctx.shadowColor = i === snake.length - 1 ? '#00ffd4' : '#00c8ff';
+          ctx.fillRect(px + 2, py + 2, cell - 4, cell - 4);
+        }
+        ctx.shadowBlur = 0;
+      }
+
+      let last = 0;
+      function loop(now) {
+        if (!last) last = now;
+        const dt = now - last;
+        last = now;
+        accumulator += dt;
+
+        // adım adım hareket
+        while (accumulator >= tick) {
+          update(dt);
+          accumulator -= tick;
+        }
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      // dokunmatik destek (basit yön bulma)
+      function handleSwipe(dirStr) {
+        if (dirStr === 'up') nextDir = {x:0, y:-1};
+        else if (dirStr === 'down') nextDir = {x:0, y:1};
+        else if (dirStr === 'left') nextDir = {x:-1, y:0};
+        else if (dirStr === 'right') nextDir = {x:1, y:0};
+      }
+
+      // Klavye kontrollü yönlendirme
+      window.addEventListener('keydown', (e) => {
+        const k = e.key;
+        if (k === 'ArrowUp' || k === 'w' || k === 'W') nextDir = {x:0, y:-1};
+        else if (k === 'ArrowDown' || k === 's' || k === 'S') nextDir = {x:0, y:1};
+        else if (k === 'ArrowLeft' || k === 'a' || k === 'A') nextDir = {x:-1, y:0};
+        else if (k === 'ArrowRight' || k === 'd' || k === 'D') nextDir = {x:1, y:0};
+        else if (k === ' ' || k === 'Enter') {
+          // boşlukla yeniden başlat (oyun bitti ise)
+          if (gameOver) resetGame();
+        } else if (k === 'Escape') {
+          // durdur/dön
+          running = !running;
+        }
+      });
+
+      // dokunmatik düğmeler
+      dpad?.addEventListener('click', (ev) => {
+        const t = ev.target.closest('.padBtn');
+        if (!t) return;
+        const dirStr = t.getAttribute('data-dir');
+        if (dirStr) handleSwipe(dirStr);
+      });
+
+      restartBtn.addEventListener('click', () => {
+        resetGame();
+      });
+
+      // Başlat
+      resize();
+      resetGame();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>

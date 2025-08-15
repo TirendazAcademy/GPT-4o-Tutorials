@@ -1,0 +1,373 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Noir Pixel Arcade — Retro-Games Landing</title>
+
+  <!-- Pixel/retro vibe fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #0b0b12;
+      --bg2: #0a0a12;
+      --panel: rgba(14,14,24,.95);
+      --text: #e9f2ff;
+      --muted: #b9c6e6;
+      --cyan: #00e5ff;
+      --magenta: #ff3bd1;
+      --amber: #ffd166;
+      --glow: 0 0 14px rgba(0,230,255,.9);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 15% -10%, rgba(0, 80, 120, 0.25), transparent 40%),
+                  radial-gradient(circle at 85% 0%, rgba(120, 0, 120, 0.25), transparent 40%),
+                  linear-gradient(#0b0b12, #0b0b12 60%, #0a0a12);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* CRT-like overlays */
+    .scanlines {
+      position: fixed;inset:0; pointer-events:none; z-index:0;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,.0) 0,
+        rgba(0,0,0,.0) 2px,
+        rgba(0,0,0,.15) 2px,
+        rgba(0,0,0,.15) 3px
+      );
+      opacity:.25;
+      mix-blend-mode: overlay;
+      animation: scan 6s infinite;
+    }
+    @keyframes scan { 0%{ transform: translateY(0); } 100%{ transform: translateY(-3px); } }
+
+    .grain {
+      position: fixed; inset:0; pointer-events:none; z-index:0;
+      background-image: url("data:image/svg+xml;utf8,\
+      <svg xmlns='http://www.w3.org/2000/svg' width='4' height='4'>\
+        <rect width='4' height='4' fill='white' fill-opacity='.04'/>\
+        <circle cx='1' cy='3' r='0.2' fill='black' />\
+        <circle cx='3' cy='1' r='0.2' fill='black' />\
+      </svg>");
+      opacity:.25;
+      mix-blend-mode: overlay;
+      animation: drift 6s infinite linear;
+    }
+    @keyframes drift { 0% { transform: translate3d(0,0,0); } 100% { transform: translate3d(-2px,1px,0); } }
+
+    /* Page chrome (neon frames) */
+    .crt-frame {
+      position: fixed; top:0; left:0; right:0; bottom:0;
+      border: 2px solid rgba(0, 230, 255, .35);
+      box-shadow: inset 0 0 60px rgba(0,230,255,.25);
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: screen;
+    }
+
+    /* Header / nav */
+    .site-header {
+      position: sticky; top:0; z-index: 10;
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 18px 28px;
+      background: rgba(7,7,12,.75);
+      backdrop-filter: blur(2px);
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .brand {
+      display:flex; align-items:center; gap:12px;
+    }
+    .brand .cabinet {
+      width:38px; height:38px; border-radius:6px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, #00e5ff, #ff3bd1 70%);
+      box-shadow: 0 0 14px rgba(0,230,255,.9);
+    }
+    .brand-name {
+      font-family: "Press Start 2P", monospace;
+      font-size: 12px; letter-spacing:.25em; color:#dff8ff;
+      text-transform: uppercase;
+    }
+    .nav { display:flex; gap: 14px; }
+    .nav a {
+      color:#dfeaff; text-decoration:none; font-family: Inter, sans-serif;
+      font-size:13px; padding:6px 10px; border-radius:6px;
+    }
+    .nav a:hover { background: rgba(255,255,255,.05); }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      text-align:center;
+      padding: 72px 20px 48px;
+      min-height: 60vh;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      z-index:1;
+    }
+    .hero h1 {
+      font-family: "Press Start 2P", monospace;
+      font-size: 46px; line-height:1.05; margin:0;
+      color:#eaffff;
+      text-shadow: 0 0 14px rgba(0,230,255,.9), 0 0 28px rgba(255,0,190,.6);
+      letter-spacing:.04em;
+    }
+    .hero p {
+      margin: 14px auto 26px;
+      max-width: 740px; color:#d6deff; font-size: 16px;
+      opacity:.95;
+    }
+    .cta-row { display:flex; gap:14px; align-items:center; justify-content:center; }
+
+    /* Section blocks */
+    .section { padding: 60px 20px; max-width:1100px; margin:0 auto; position:relative; z-index:1; }
+    .section h2 {
+      font-family: "Press Start 2P", monospace;
+      font-size: 18px; color:#e9f7ff; text-transform: uppercase; letter-spacing:.16em;
+      margin-bottom:14px;
+    }
+    .section p { color:#cbd7ff; }
+
+    /* Cards grid */
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:18px; }
+    .card {
+      background: linear-gradient(180deg, rgba(14,14,24,.95), rgba(10,10,18,.95));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px; padding:12px; display:flex; flex-direction:column; justify-content:space-between;
+      box-shadow: 0 8px 22px rgba(0,0,0,.4);
+      transition: transform .2s ease;
+    }
+    .card:hover { transform: translateY(-2px); }
+    .card-media {
+      height: 150px; border-radius:8px; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(135deg, #0b1020, #1b1b2e);
+    }
+    .card-media svg { width: 110px; height: 90px; }
+    .card-title { font-family: Inter, sans-serif; font-weight:700; font-size:14px; color:#eaffff; margin:8px 0 6px; }
+    .card p { font-size:12px; color:#cbd7ff; margin:0 0 8px; }
+    .card-foot { display:flex; align-items:center; justify-content:space-between; padding-top:6px; }
+
+    .price { font-family: monospace; color:#aaffcc; font-weight:700; }
+
+    /* Newsletter / signup */
+    .newsletter {
+      background: linear-gradient(135deg, rgba(10,12,28,.92), rgba(20,14,28,.92));
+      border:1px solid rgba(0, 230, 255, .3);
+      padding: 28px; border-radius:12px; display:grid; grid-template-columns: 1fr auto; gap:12px;
+      align-items:center;
+    }
+    .newsletter input {
+      width:100%; padding:12px 14px; border-radius:8px;
+      border:1px solid rgba(255,255,255,.25);
+      background: rgba(0,0,0,.4); color:#fff;
+    }
+    .newsletter button { padding:12px 18px; border-radius:8px; }
+
+    @media (max-width: 700px){
+      .hero { padding: 48px 12px; }
+      .hero h1 { font-size: 32px; }
+      .newsletter { grid-template-columns: 1fr; }
+    }
+
+    /* Subtle neon accents for headings */
+    .neon { text-shadow: 0 0 8px rgba(0,230,255,.9); color: #eaffff; }
+
+    /* Small helper visuals (optional) */
+    .chip {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.25);
+      background: rgba(0,0,0,.35);
+      font-size:12px; color:#cfe8ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="crt-frame" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="site-header" role="navigation" aria-label="Main">
+    <div class="brand" aria-label="Noir Pixel Arcade brand">
+      <div class="cabinet" aria-label="Arcade cabinet logo">
+        <!-- tiny inline arcade cabinet glyph -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-label="cabinet icon" role="img" focusable="false">
+          <rect x="3" y="6" width="18" height="12" rx="2" fill="#111"/>
+          <rect x="5" y="9" width="14" height="6" rx="1" fill="#1ee1ff"/>
+          <rect x="9" y="11" width="2" height="3" rx="1" fill="#000"/>
+          <rect x="13" y="11" width="2" height="3" rx="1" fill="#000"/>
+        </svg>
+      </div>
+      <div class="brand-name" aria-label="Brand name">NOIR PIXEL ARCADE</div>
+    </div>
+    <nav class="nav" aria-label="Site navigation">
+      <a href="#shop" aria-label="Shop catalog">Shop</a>
+      <a href="#newsletter" aria-label="Newsletter signup">Newsletter</a>
+      <a href="#about" aria-label="About noir arcade">About</a>
+    </nav>
+  </header>
+
+  <section class="hero" aria-label="Hero section">
+    <h1>Retro-Arcade Noir</h1>
+    <p>Where the glow of neon CRTs meets the grit of noir nights. Curated classics, modern reissues, and midnight drops that never fade.</p>
+    <div class="cta-row">
+      <a href="#shop" class="neon btn btn-primary" style="text-decoration:none;">ENTER THE ARCADE</a>
+      <span class="chip" aria-label="Delivery options">
+        <span style="width:8px; height:8px; background:#0ff; display:inline-block; border-radius:2px; box-shadow:0 0 8px #0ff;"></span>
+        Free shipping over $50
+      </span>
+    </div>
+  </section>
+
+  <section id="shop" class="section" aria-label="Shop section">
+    <h2>Featured Classics</h2>
+    <p>Icons of the arcade era, reimagined for your shelf. Click Add to cart to conjure a glow in your own noir-lit room.</p>
+
+    <div class="grid" role="list">
+      <!-- Card 1: SNES Classic -->
+      <article class="card" role="listitem" aria-label="Super Nintendo Classic">
+        <div class="card-media" aria-label="SNES Classic image">
+          <!-- inline SVG cabinet art -->
+          <svg width="120" height="90" viewBox="0 0 120 90" role="img" aria-label="SNES cabinet">
+            <rect x="0" y="0" width="120" height="90" rx="8" fill="#0a0a14" stroke="#3a3a58"/>
+            <rect x="14" y="26" width="92" height="40" rx="6" fill="#1b1b2e" stroke="#2d3a58"/>
+            <rect x="22" y="32" width="76" height="28" rx="4" fill="#0f1a2a" />
+            <circle cx="28" cy="45" r="3" fill="#00e5ff"/>
+            <circle cx="44" cy="45" r="3" fill="#ff3bd1"/>
+            <rect x="30" y="66" width="60" height="12" rx="6" fill="#2a2a55"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Super NES Classic</div>
+          <p class="muted" style="margin:0;">A compact throwback with built-in classics and CRT-tinged charm.</p>
+        </div>
+        <div class="card-foot">
+          <span class="price">$199</span>
+          <button class="btn btn-ghost" aria-label="Add SNES Classic to cart" style="color:#a9f3ff;border-color:#3a7bd5;background:transparent;">Add to cart</button>
+        </div>
+      </article>
+
+      <!-- Card 2: Sega Genesis Mini -->
+      <article class="card" role="listitem" aria-label="Sega Genesis Mini">
+        <div class="card-media" aria-label="Genesis Mini image">
+          <svg width="120" height="90" viewBox="0 0 120 90" role="img" aria-label="Genesis cabinet">
+            <rect x="0" y="0" width="120" height="90" rx="8" fill="#0b0c14" stroke="#3a3a58"/>
+            <rect x="12" y="26" width="96" height="40" rx="6" fill="#1e1e2a"/>
+            <circle cx="42" cy="46" r="3" fill="#00e5ff"/>
+            <circle cx="64" cy="46" r="3" fill="#ff3bd1"/>
+            <rect x="26" y="66" width="68" height="12" rx="6" fill="#2a2a55"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Sega Genesis Mini</div>
+          <p class="muted" style="margin:0;">8-bit era energy, with a neon halo and arcade swagger.</p>
+        </div>
+        <div class="card-foot">
+          <span class="price">$89</span>
+          <button class="btn btn-ghost" aria-label="Add Genesis Mini to cart" style="color:#a9f3ff;border-color:#3a7bd5;background:transparent;">Add to cart</button>
+        </div>
+      </article>
+
+      <!-- Card 3: Atari Flashback -->
+      <article class="card" role="listitem" aria-label="Atari Flashback">
+        <div class="card-media" aria-label="Atari Flashback image">
+          <svg width="120" height="90" viewBox="0 0 120 90" role="img" aria-label="Atari cabinet">
+            <rect x="0" y="0" width="120" height="90" rx="8" fill="#0b0b12" stroke="#3a3a58"/>
+            <rect x="14" y="18" width="92" height="54" rx="6" fill="#1a1a2b"/>
+            <rect x="28" y="28" width="36" height="12" rx="2" fill="#00e5ff"/>
+            <rect x="70" y="28" width="30" height="12" rx="2" fill="#ff3bd1"/>
+            <rect x="40" y="50" width="40" height="6" rx="3" fill="#2a2a55"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Atari Flashback</div>
+          <p class="muted" style="margin:0;">Iconic arcade-in-a-box with a retro-futurist glow.</p>
+        </div>
+        <div class="card-foot">
+          <span class="price">$59</span>
+          <button class="btn btn-ghost" aria-label="Add Atari Flashback to cart" style="color:#a9f3ff;border-color:#3a7bd5;background:transparent;">Add to cart</button>
+        </div>
+      </article>
+
+      <!-- Card 4: Neo Geo Mini -->
+      <article class="card" role="listitem" aria-label="Neo Geo Mini">
+        <div class="card-media" aria-label="Neo Geo Mini image">
+          <svg width="120" height="90" viewBox="0 0 120 90" role="img" aria-label="Neo Geo cabinet">
+            <rect x="0" y="0" width="120" height="90" rx="8" fill="#0b0c14" stroke="#3a3a58"/>
+            <rect x="16" y="26" width="88" height="40" rx="6" fill="#1e1e2a"/>
+            <circle cx="52" cy="46" r="3" fill="#00e5ff"/>
+            <circle cx="78" cy="46" r="3" fill="#ff3bd1"/>
+            <rect x="28" y="66" width="64" height="10" rx="5" fill="#2a2a55"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Neo Geo Mini</div>
+          <p class="muted" style="margin:0;">A pocket-sized arcade power-up with a neon heartbeat.</p>
+        </div>
+        <div class="card-foot">
+          <span class="price">$120</span>
+          <button class="btn btn-ghost" aria-label="Add Neo Geo Mini to cart" style="color:#a9f3ff;border-color:#3a7bd5;background:transparent;">Add to cart</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="about" class="section" aria-label="About section">
+    <h2>About Noir Pixel Arcade</h2>
+    <p>
+      We curate consoles, mini cabinets, and select peripherals that glow with the neon grit of arcades you love.
+      Our space is a tiny portal to the 80s and 90s—tuned for modern living rooms with CRT-kind lighting and midnight vibes.
+    </p>
+  </section>
+
+  <section id="newsletter" class="section" aria-label="Newsletter signup">
+    <div class="newsletter" role="form" aria-label="Newsletter form">
+      <div>
+        <h3 style="margin:0 0 6px; font-family: 'Press Start 2P', monospace; font-size: 14px; letter-spacing:.2em; color:#eaffff;">
+          JOIN THE GLOW
+        </h3>
+        <p style="margin:0; color:#cbd7ff;">Get drops, early access, and midnight sale codes—straight to your inbox.</p>
+      </div>
+      <form onsubmit="return false;" aria-label="Newsletter form controls" style="display:flex; gap:8px; align-items:center;">
+        <input type="email" placeholder="you@domain.com" required aria-label="Email address" />
+        <button type="submit" class="neon btn btn-primary" style="padding:12px 16px; border-radius:8px;">Join</button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="section footer" id="footer" aria-label="Footer">
+    <p style="opacity:.9; margin:0;">
+      © <span id="year"></span> Noir Pixel Arcade — all vibes, no spoilers.
+      Built with neon, nostalgia, and a hint of noir.
+    </p>
+  </footer>
+
+  <script>
+    // Small UX: year
+    document.getElementById('year')?.textContent = new Date().getFullYear();
+
+    // Smooth scroll for in-page anchors (optional enhancement)
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const id = a.getAttribute('href').slice(1);
+        const el = document.getElementById(id);
+        if (el) {
+          e.preventDefault();
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+```

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neon Byte Arcade - Retro Games & Noir</title>
+
+  <!-- Pixel / retro vibe font -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #0b0b0f;
+      --bg2: #141419;
+      --card: #1b1b1f;
+      --text: #e9e9ff;
+      --muted: #b5b5c8;
+      --neon: #ff2e9a;
+      --cyan: #1ee7d2;
+      --amber: #ffd166;
+      --shadow: rgba(0,0,0,.6);
+    }
+
+    /* Global reset-ish */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: #0a0a0f;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background-image:
+        linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)),
+        radial-gradient(circle at 20% -10%, rgba(0,255,210,.05), transparent 25%),
+        radial-gradient(circle at 100% 0%, rgba(255,0,180,.05), transparent 25%);
+      background-color: var(--bg);
+      overflow-x: hidden;
+    }
+
+    /* Subtle scanlines for noir vibe */
+    body::before{
+      content:"";
+      position: fixed;
+      left:0; top:0; right:0; height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.04),
+        rgba(255,255,255,.04) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: overlay;
+      opacity: .5;
+    }
+
+    .container{ max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+    /* Header / Nav */
+    header.site-header {
+      position: sticky; top: 0; z-index: 50;
+      background: linear-gradient(to bottom, rgba(10,10,15,.95), rgba(10,10,15,.75) 60%, rgba(10,10,15,.0));
+      backdrop-filter: saturate(1.2) blur(3px);
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .header-inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 0;
+    }
+    .logo {
+      display:flex; align-items:center; gap:12px;
+      font-family: "Press Start 2P", monospace;
+      font-size: 14px; letter-spacing: 1px;
+      color: #fff; text-decoration: none;
+    }
+    .logo-badge {
+      width: 28px; height: 28px; border-radius: 4px;
+      background: linear-gradient(135deg, #1bffcd 0%, #ff2e9a 100%);
+      box-shadow: 0 0 12px rgba(0,255,210,.9);
+      display:inline-block;
+      position: relative;
+    }
+    nav ul{ list-style: none; display:flex; gap: 18px; padding:0; margin:0; }
+    nav a{ color:#d9d9ff; text-decoration:none; font-family: Arial, sans-serif; font-size:14px; opacity:.95; }
+    nav a:hover{ color:#fff; text-shadow: 0 0 8px rgba(34,200,255,.8); }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 12px 16px; border-radius: 8px;
+      border: none; cursor: pointer;
+      font-family: "Montserrat", sans-serif; font-weight: 700;
+      text-decoration: none;
+      transition: transform .2s ease;
+    }
+    .btn:focus { outline: 2px solid #fff; outline-offset: 2px; }
+    .btn:hover{ transform: translateY(-1px); }
+
+    .btn-cart { background: #111; color: #fff; border: 1px solid #333; padding: 8px 12px; border-radius: 6px; }
+    .btn-ghost { background: transparent; color: #fff; border: 1px solid #444; padding: 10px 14px; border-radius: 6px; }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff2e9a 0%, #7c1cff 100%);
+      color: #fff; border: 0; padding: 12px 18px; border-radius: 10px;
+      text-shadow: 0 1px 0 rgba(0,0,0,.3);
+      box-shadow: 0 6px 18px rgba(255,46,154,.6);
+    }
+    .btn-secondary {
+      background: linear-gradient(135deg, #1e2730 0%, #11161d 100%);
+      color: #dbf2ff; border: 1px solid #2b3340;
+      padding: 12px 18px; border-radius: 10px;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      gap: 40px;
+      padding: 40px 0 60px;
+    }
+    .hero h1 {
+      font-family: "Press Start 2P", monospace;
+      font-size: 40px; line-height: 1.15;
+      margin: 6px 0 14px;
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255,255,255,.2);
+    }
+    .hero p{ color: var(--muted); font-size: 16px; max-width: 60ch; }
+
+    .hero-cta{ display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+
+    .hero-art {
+      display:flex; align-items:center; justify-content:center;
+      perspective: 1000px;
+    }
+    .hero-cabinet { width: 320px; height: 420px; filter: drop-shadow(0 8px 16px rgba(0,0,0,.6)); }
+
+    @media (max-width: 900px){
+      .hero { grid-template-columns: 1fr; padding: 20px 0 40px; }
+      .hero h1 { font-size: 28px; }
+      .hero-cabinet { width: 260px; height: 360px; }
+    }
+
+    /* Catalog / cards grid */
+    section#catalog { padding: 40px 0 20px; }
+    section h2{ font-family: "Montserrat", sans-serif; font-weight: 700; font-size: 22px; color:#fff; margin: 0 0 14px; }
+
+    .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media(max-width: 900px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+    @media(max-width: 620px){ .grid{ grid-template-columns: 1fr; } }
+
+    .card { background: #14141a; border: 1px solid #2b2b34; border-radius: 12px; overflow: hidden; display:flex; flex-direction:column; }
+    .card .image {
+      height: 160px; background: linear-gradient(135deg, #111, #333);
+      display:flex; align-items:center; justify-content:center;
+      color:#a7a7a7; font-family: "Press Start 2P", monospace;
+    }
+    .card .content{ padding: 12px; display:flex; flex-direction:column; gap:6px; }
+    .card h3{ font-family: "Montserrat", sans-serif; font-size: 14px; margin:0; color:#fff; }
+    .price{ font-family: "Montserrat", sans-serif; font-weight:700; color:#fff; }
+    .card button{ margin-top: 6px; }
+
+    /* Deals / features strip */
+    .deal-strip { display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; padding: 20px 0 8px; }
+    .deal {
+      background: linear-gradient(135deg, rgba(12,14,24,.95), rgba(12,14,24,.75));
+      border: 1px solid #2a2a3a; border-radius: 12px; padding: 14px;
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .deal h4{ margin:0; font-family: "Montserrat", sans-serif; font-size: 14px; color:#fff; }
+    .deal p{ margin:0; color: #cbd2e6; font-size: 12px; }
+
+    /* Newsletter */
+    #newsletter { background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.55)); border-top: 1px solid rgba(255,255,255,.05); padding: 28px 0 60px; }
+    #newsletter form { display:flex; gap:10px; flex-wrap: wrap; align-items: center; }
+    #newsletter input[type="email"]{
+      padding: 12px 14px; border-radius: 8px; border:1px solid #333;
+      min-width: 240px; width: calc(100% - 180px);
+      background:#0a0a10; color:#fff;
+    }
+    #newsletter button{ padding: 12px 18px; border-radius: 8px; }
+
+    /* Footer */
+    footer.site-footer { padding: 28px 0; color: #b6b6c8; text-align:center; font-size: 12px; border-top: 1px solid rgba(255,255,255,.05); }
+
+  </style>
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="site-header" aria-label="Main navigation">
+    <div class="container header-inner">
+      <a href="#" class="logo" aria-label="Neon Byte Arcade home">
+        <span class="logo-badge" aria-hidden="true"></span>
+        Neon Byte Arcade
+      </a>
+
+      <nav aria-label="Main">
+        <ul>
+          <li><a href="#catalog">Catalog</a></li>
+          <li><a href="#deals">Deals</a></li>
+          <li><a href="#newsletter">Newsletter</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </nav>
+
+      <button class="btn btn-cart" aria-label="Open shopping cart">Cart</button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" aria-label="Hero">
+    <div class="container" style="padding-top:6px;">
+      <div class="tag" style="color:#cbd5ff; font-family: 'Montserrat', sans-serif; font-weight:700; letter-spacing:.14em; text-transform: uppercase; font-size:12px;">
+        Retro • Neon • Noir
+      </div>
+      <h1>Retro-Arcade Noir</h1>
+      <p>Curated crates of classic cartridges, handhelds, and arcade memorabilia. Step into the glow of neon pixels and velvet-black nights.</p>
+
+      <div class="hero-cta">
+        <a href="#catalog" class="btn btn-primary">Shop Catalog</a>
+        <a href="#about" class="btn btn-secondary">Our Story</a>
+      </div>
+    </div>
+
+    <div class="container hero-art" aria-hidden="true" style="padding:0;">
+      <!-- Inline SVG arcade cabinet (pixel-art vibe) -->
+      <svg class="hero-cabinet" viewBox="0 0 320 420" width="320" height="420" role="img" aria-label="Retro arcade cabinet artwork">
+        <!-- cabinet body -->
+        <defs>
+          <linearGradient id="cabGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop stop-color="#1b1b1b"/>
+            <stop offset="1" stop-color="#0a0a0f"/>
+          </linearGradient>
+          <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#111a2a"/>
+            <stop offset="1" stop-color="#050a0f"/>
+          </linearGradient>
+          <radialGradient id="neon" cx="50%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#9af" stop-opacity="1"/>
+            <stop offset="60%" stop-color="#f0f" stop-opacity="0.7"/>
+            <stop offset="100%" stop-color="#900" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- base cabinet -->
+        <path d="M60 90 h200 a14 14 0 0 1 14 14 v220 a14 14 0 0 1 -14 14 h-98 l-60 0 a16 16 0 0 1 -16 -16 v-214 a14 14 0 0 1 14 -14 z"
+              fill="url(#cabGrad)" stroke="#2a2a32" stroke-width="2"/>
+
+        <!-- bezel / glass -->
+        <rect x="86" y="112" width="148" height="120" rx="10" fill="url(#screenGrad)" stroke="#2a2a2a" stroke-width="2"/>
+        <!-- screen shine -->
+        <ellipse cx="160" cy="162" rx="68" ry="28" fill="rgba(255,255,255,.08)"/>
+
+        <!-- monitor content (fake game scan) -->
+        <rect x="94" y="134" width="132" height="74" rx="6" fill="#061018" />
+        <circle cx="124" cy="170" r="4" fill="#0ff"/>
+        <circle cx="146" cy="170" r="3" fill="#f0f"/>
+        <circle cx="160" cy="170" r="3" fill="#ff0"/>
+
+        <!-- control panel -->
+        <rect x="68" y="210" width="184" height="20" rx="3" fill="#222" />
+        <!-- joystick -->
+        <rect x="98" y="236" width="8" height="40" rx="4" fill="#3bd"/>
+        <circle cx="102" cy="232" r="10" fill="#0ff" opacity=".9"/>
+        <!-- buttons -->
+        <circle cx="170" cy="235" r="7" fill="#f0f" />
+        <circle cx="184" cy="235" r="7" fill="#ff6" />
+        <circle cx="156" cy="235" r="7" fill="#0f9" />
+
+        <!-- neon glow
+             a subtle glow around cabinet -->
+        <ellipse cx="160" cy="90" rx="150" ry="60" fill="url(#neon)" opacity=".25"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Catalog Preview -->
+  <section id="catalog" aria-labelledby="catalog-title" class="container" style="padding-top: 0;">
+    <h2 id="catalog-title" style="margin-top:6px; font-family: 'Montserrat', sans-serif; font-weight:700; font-size: 20px;">Featured Classics</h2>
+
+    <div class="grid" aria-label="Product grid">
+      <!-- Product Card 1 -->
+      <article class="card">
+        <div class="image" aria-label="Game image placeholder" style="background: linear-gradient(135deg, #111 0%, #2a2a2a 100%);">
+          <span style="font-family: 'Press Start 2P', monospace; font-size: 12px; color:#bbb;">NES • Super Retro Bros</span>
+        </div>
+        <div class="content">
+          <h3>Super Retro Bros. (NES)</h3>
+          <span class="price">$59.99</span>
+          <button class="btn btn-ghost" aria-label="Add Super Retro Bros. to cart">Add to cart</button>
+        </div>
+      </article>
+
+      <!-- Product Card 2 -->
+      <article class="card">
+        <div class="image" aria-label="Game image placeholder" style="background: linear-gradient(135deg, #1a0f2c, #0b1020);">
+          <span style="font-family: 'Press Start 2P', monospace; font-size: 12px; color:#ddd;">SNES • Turbo Racer</span>
+        </div>
+        <div class="content">
+          <h3>Turbo Racer (SNES)</h3>
+          <span class="price">$44.50</span>
+          <button class="btn btn-ghost" aria-label="Add Turbo Racer to cart">Add to cart</button>
+        </div>
+      </article>
+
+      <!-- Product Card 3 -->
+      <article class="card">
+        <div class="image" aria-label="Game image placeholder" style="background: linear-gradient(135deg, #0b1b2a, #0a0a14);">
+          <span style="font-family: 'Press Start 2P', monospace; font-size: 12px; color:#b7f5ff;">PS1 • Neon Quest</span>
+        </div>
+        <div class="content">
+          <h3>Neon Quest (PS1)</h3>
+          <span class="price">$29.99</span>
+          <button class="btn btn-ghost" aria-label="Add Neon Quest to cart">Add to cart</button>
+        </div>
+      </article>
+
+      <!-- Product Card 4 -->
+      <article class="card">
+        <div class="image" aria-label="Game image placeholder" style="background: linear-gradient(135deg, #0a1a2a, #071018);">
+          <span style="font-family: 'Press Start 2P', monospace; font-size: 12px; color:#f7f7f7;">Arcade Mini • Pixel Punch</span>
+        </div>
+        <div class="content">
+          <h3>Pixel Punch Arcade Mini</h3>
+          <span class="price">$79.99</span>
+          <button class="btn btn-ghost" aria-label="Add Pixel Punch Arcade Mini to cart">Add to cart</button>
+        </div>
+      </article>
+
+      <!-- Product Card 5 -->
+      <article class="card">
+        <div class="image" aria-label="Game image placeholder" style="background: linear-gradient(135deg, #1d2a20, #0a0a0a);">
+          <span style="font-family: 'Press Start 2P', monospace; font-size: 12px; color:#a8ffa7;">GB • Quest of Stars</span>
+        </div>
+        <div class="content">
+          <h3>Quest of Stars (GB)</h3>
+          <span class="price">$39.99</span>
+          <button class="btn btn-ghost" aria-label="Add Quest of Stars to cart">Add to cart</button>
+        </div>
+      </article>
+
+      <!-- Product Card 6 -->
+      <article class="card">
+        <div class="image" aria-label="Game image placeholder" style="background: linear-gradient(135deg, #2a1d3a, #0a0a0a);">
+          <span style="font-family: 'Press Start 2P', monospace; font-size: 12px; color:#ffd;">Switch • Neon Knight</span>
+        </div>
+        <div class="content">
+          <h3>Neon Knight (Switch)</h3>
+          <span class="price">$69.99</span>
+          <button class="btn btn-ghost" aria-label="Add Neon Knight to cart">Add to cart</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Deals / About / Newsletter anchor target -->
+  <section id="deals" class="container" aria-labelledby="deals-title" style="padding-top: 10px;">
+    <h2 id="deals-title" style="font-family: 'Montserrat', sans-serif; font-weight:700; font-size:20px; color:#fff; margin-top: 6px;">Neo-Noir Deals</h2>
+
+    <div class="deal-strip" aria-label="Special deals">
+      <div class="deal">
+        <h4>Moonlight Bundle</h4>
+        <p>Save 22% on a classic SNES collection this week.</p>
+      </div>
+      <div class="deal">
+        <h4>Arcade Night Pass</h4>
+        <p>Exclusive access to retro arcade events for members.</p>
+      </div>
+      <div class="deal">
+        <h4>Cart Neon Bonus</h4>
+        <p>Free neon keychain with orders over $75.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About (story) -->
+  <section id="about" class="container" aria-label="About the store" style="padding-top: 10px; padding-bottom: 40px;">
+    <h2 style="font-family: 'Montserrat', sans-serif; font-weight:700; font-size:20px; color:#fff; margin-top: 6px;">About Neon Byte Arcade</h2>
+    <p style="color:var(--muted); max-width: 70ch;">
+      In a city lit by neon and nostalgia, Neon Byte Arcade curates the boldest collection of retro games,
+      cartridges, and arcade memorabilia. We ship worldwide and celebrate the culture of pixel-perfect joy—noir nights, bright pixels, and everything in between.
+    </p>
+  </section>
+
+  <!-- Newsletter -->
+  <section id="newsletter" aria-label="Newsletter" class="container" style="padding-top: 0;">
+    <h2 style="font-family: 'Montserrat', sans-serif; font-weight:700; font-size:20px; color:#fff;">Stay in the neon loop</h2>
+    <p style="color: var(--muted); max-width: 60ch; margin-top: 6px;">Get updates on drops, sales, and retro events.</p>
+
+    <form action="#" method="post" aria-label="Newsletter signup">
+      <input type="email" name="email" placeholder="you@neonbyte.example" required aria-label="Email address" />
+      <button class="btn btn-primary" type="submit" aria-label="Subscribe to newsletter">Subscribe</button>
+    </form>
+  </section>
+
+  <footer class="site-footer" aria-label="Footer">
+    <div class="container" style="padding: 6px 0;">
+      © Neon Byte Arcade. All neon rights reserved.
+      <span style="margin-left: 12px;">Follow us:
+        <a href="#" style="color:#8af; text-decoration:none; margin-left:6px;">Instagram</a>,
+        <a href="#" style="color:#8af; text-decoration:none; margin-left:6px;">Twitter</a>
+      </span>
+    </div>
+  </footer>
+
+  <!-- Optional small JS for smooth scrolling (enhanced UX) -->
+  <script>
+    // Smooth scrolling for in-page anchors
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bloom & Byte Retro Games</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #fffaf5;
+      --pink: #ffc8e7;
+      --pink-dark: #f49bb0;
+      --mint: #c9f4e0;
+      --mint-dark: #98e0c9;
+      --lav: #d7d5ff;
+      --peach: #ffd9bf;
+      --sky: #d7f0ff;
+      --text: #2b2b2b;
+      --muted: #5b5b5b;
+      --card: #ffffff;
+      --shadow: rgba(0,0,0,.08);
+    }
+
+    /* Base styling */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      color: var(--text);
+      background: radial-gradient(circle at 10% -10%, rgba(255,200,230,.25), transparent 20%),
+                  radial-gradient(circle at 90% 0%, rgba(180,220,255,.25), transparent 20%),
+                  linear-gradient(135deg, #fffaf7 0%, #f7fbff 60%, #fff5f0 100%);
+      overflow-x: hidden;
+    }
+
+    /* Decorative flower emoji (floats for flowery vibe) */
+    .flower {
+      position: absolute;
+      font-size: 28px;
+      filter: saturate(1.1);
+      opacity: .75;
+      user-select: none;
+      pointer-events: none;
+    }
+    .flower.f1 { top: 40px; left: 20px; }
+    .flower.f2 { top: 120px; right: 40px; font-size: 34px; animation: float 6s ease-in-out infinite; }
+    .flower.f3 { bottom: 40px; left: 40px; font-size: 30px; animation: float 8s ease-in-out infinite; }
+
+    @keyframes float{
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* Layout helpers */
+    .container { width: min(1100px, 92%); margin: 0 auto; }
+
+    header {
+      position: relative;
+      padding: 18px 0;
+      z-index: 2;
+    }
+
+    /* Navbar */
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      font-family: "Baloo 2", cursive;
+      font-size: 28px; letter-spacing: .5px;
+      color: #2f2f2f;
+    }
+    .brand .logo {
+      width: 38px; height: 38px; border-radius: 9px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, #ffd6e4, #ffe4c2);
+      box-shadow: 0 6px 12px rgba(0,0,0,.08);
+      border: 2px solid #fff;
+    }
+    nav ul {
+      display: flex; list-style: none; padding: 0; margin: 0; gap: 14px;
+    }
+    nav a {
+      text-decoration: none; color: #2b2b2b;
+      padding: 10px 14px; border-radius: 999px;
+      transition: all .2s ease;
+      background: rgba(255,255,255,.6);
+    }
+    nav a:hover { transform: translateY(-1px); background: rgba(255,255,255,.95); }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      padding: 56px 0 28px;
+      overflow: hidden;
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 28px; align-items: center;
+    }
+    .hero h1 {
+      font-family: "Baloo 2", cursive;
+      font-size: 64px; line-height: 1.04;
+      margin: 0 0 12px;
+      background: linear-gradient(90deg, #ff6ea8 0%, #7bdff6 50%, #ffd76a 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      letter-spacing: .5px;
+    }
+    .tagline {
+      font-size: 18px; color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      padding: 12px 18px; border-radius: 999px;
+      border: none; cursor: pointer;
+      font-weight: 700; font-family: "Baloo 2", cursive;
+      transition: transform .2s ease, box-shadow .2s ease;
+      box-shadow: 0 6px 14px rgba(0,0,0,.08);
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, #ffb3d1 0%, #ffd4a3 100%);
+      color: #2b2b2b;
+    }
+    .btn.secondary {
+      background: rgba(255,255,255,.8);
+      border: 1px solid #ffd0e0;
+      color: #2b2b2b;
+    }
+    .btn:focus { outline: 2px solid #7bdff6; outline-offset: 2px; }
+
+    /* Hero illustration (cute cartridge silhouette) */
+    .hero-illus {
+      display: grid; place-items: center;
+    }
+    .stamp {
+      width: 320px; height: 220px;
+      background: conic-gradient(from 180deg at 50% 50%, rgba(255,199,219,.9), rgba(205,252,245,.9), rgba(255,231,204,.9), rgba(255,199,219,.9));
+      border-radius: 28px;
+      box-shadow: 0 12px 22px rgba(0,0,0,.08);
+      display: grid; place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .stamp:after {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,.9), transparent 40%);
+      mix-blend-mode: overlay;
+    }
+    .stamp svg { width: 180px; height: 120px; }
+
+    /* Sections */
+    section { padding: 48px 0; }
+    .section-title {
+      font-family: "Baloo 2", cursive;
+      font-size: 32px; margin: 0 0 6px;
+    }
+    .section-sub { color: var(--muted); margin-bottom: 20px; }
+
+    /* Cards grid */
+    .grid {
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px; padding: 14px;
+      box-shadow: 0 6px 14px rgba(0,0,0,.04);
+      display: flex; flex-direction: column; align-items: stretch;
+      min-height: 260px;
+    }
+    .card .image {
+      height: 120px; display: grid; place-items: center;
+      border-radius: 12px; background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+      margin-bottom: 8px;
+    }
+    .card h3 { font-size: 16px; margin: 6px 0 6px; }
+    .price { font-weight: 700; margin: auto 0 8px; color: #333; }
+    .card .add {
+      margin-top: auto;
+      background: linear-gradient(135deg, #ffd8e9, #e7ffd4);
+      border: none; border-radius: 999px; padding: 10px 12px;
+      font-weight: 700; cursor: pointer;
+    }
+
+    /* Newsletter */
+    .newsletter {
+      background: linear-gradient(135deg, rgba(255, 255, 255, .9), rgba(252, 244, 239, .95));
+      border-radius: 16px; padding: 20px; display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: center;
+      box-shadow: 0 6px 14px rgba(0,0,0,.04);
+    }
+    .newsletter input[type="email"] {
+      width: 100%; padding: 12px 14px; border-radius: 999px;
+      border: 1px solid #f0d7e9; font-size: 14px;
+      background: #fff;
+    }
+    .footer {
+      padding: 28px 0; text-align: center; color: var(--muted);
+      border-top: 1px solid #f0e5e5;
+    }
+
+    /* Responsiveness */
+    @media (max-width: 1020px){
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .hero-inner { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 800px){
+      .hero { padding: 28px 0 12px; }
+      .hero h1 { font-size: 44px; }
+      .hero-inner { grid-template-columns: 1fr; text-align: left; }
+      .stamp { width: 290px; height: 190px; }
+      .newsletter { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      nav ul { display: none; } /* simplified nav on small screens */
+    }
+    @media (max-width: 420px){
+      .grid { grid-template-columns: 1fr; }
+      .stamp { width: 260px; height: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- decorative flowers -->
+  <div class="flower f1" aria-hidden="true">🌼</div>
+  <div class="flower f2" aria-hidden="true">🌸</div>
+  <div class="flower f3" aria-hidden="true">💐</div>
+
+  <header class="container" style="position: relative;">
+    <div class="nav" aria-label="Main">
+      <div class="brand">
+        <span class="logo" aria-label="logo">🟪</span>
+        Bloom & Byte Retro
+      </div>
+      <nav aria-label="Site">
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#catalog">Catalog</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#events">Events</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <section class="hero" aria-label="Hero">
+      <div class="hero-inner container">
+        <div>
+          <h1>Pastel Pixels & Petal Power</h1>
+          <p class="tagline">A cozy corner for retro game lovers. Think sunshine, sprinkle sprites, and all the classic cartridges you love.</p>
+          <div class="cta-row">
+            <button class="btn primary" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Shop the Catalog</button>
+            <button class="btn secondary" onclick="window.scrollTo({top:0,behavior:'smooth'})">See Brand Story</button>
+          </div>
+        </div>
+        <div class="hero-illus" aria-label="Retro cartridge illustration">
+          <div class="stamp" role="img" aria-label="Pastel cartridge illustration">
+            <!-- simple pixel-art style cartridge using SVG -->
+            <svg viewBox="0 0 200 120" width="180" height="120" aria-label="cartridge">
+              <defs>
+                <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+                  <stop stop-color="#ffd1e0" offset="0"/>
+                  <stop stop-color="#c9f4d7" offset="1"/>
+                </linearGradient>
+              </defs>
+              <!-- cartridge body -->
+              <rect x="28" y="26" rx="8" ry="8" width="144" height="68" fill="url(#g1)" stroke="#f3a6c3" stroke-width="2"/>
+              <!-- notch -->
+              <path d="M20,40 h14 v-8 h-4 a6,6 0 0 1 -6,6z" fill="#fff3" />
+              <!-- label -->
+              <rect x="46" y="38" width="90" height="34" rx="4" fill="#fff" stroke="#e0e0e0"/>
+              <text x="91" y="59" text-anchor="middle" font-family="monospace" font-size="10" fill="#555">PIXEL Q</text>
+              <!-- cartridge bottom prong -->
+              <rect x="60" y="88" width="80" height="8" rx="2" fill="#f5c7d9" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main class="container" id="catalog">
+    <!-- Features quick picks -->
+    <section aria-labelledby="features" style="margin-top: 4rem;">
+      <h2 class="section-title" id="features" style="text-align:center;">What you’ll find</h2>
+      <p class="section-sub" style="text-align:center;">Soft colors, big nostalgia. Retro goodies for every bedtime story of gaming.</p>
+
+      <div class="grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="card" aria-label="Consoles">
+          <div class="image" aria-label="Pastel console icon">
+            <!-- simple pastel controller SVG -->
+            <svg width="72" height="48" viewBox="0 0 72 48" aria-label="controller">
+              <path d="M6 28c2-6 8-12 24-12s22 6 24 12-6 8-12 8-18-2-24-8-6-4-12-0z" fill="#ffd9e8" stroke="#f2a7c8"/>
+              <circle cx="18" cy="24" r="3" fill="#fff"/>
+              <circle cx="36" cy="24" r="3" fill="#fff"/>
+              <circle cx="54" cy="24" r="3" fill="#fff"/>
+            </svg>
+          </div>
+          <h3>Classic Consoles</h3>
+          <p class="section-sub" style="margin:0 0 8px;">Sleek mini-restocks and working originals for your shelf.</p>
+        </div>
+
+        <div class="card" aria-label="Cartridges">
+          <div class="image" aria-label="Cartridge icon">
+            <svg width="72" height="48" viewBox="0 0 72 48" aria-label="cartridge">
+              <rect x="6" y="10" width="60" height="28" rx="4" fill="#ffd9e8" stroke="#f0a2b8"/>
+              <rect x="14" y="16" width="44" height="6" rx="3" fill="#fff"/>
+              <rect x="14" y="26" width="28" height="2" rx="1" fill="#fff"/>
+            </svg>
+          </div>
+          <h3>Cartridge Collections</h3>
+          <p class="section-sub" style="margin:0 0 8px;">Curated sets, labels, and stickers for that vintage vibe.</p>
+        </div>
+
+        <div class="card" aria-label="Arcade miniatures">
+          <div class="image" aria-label="arcade icon">
+            <svg width="72" height="48" viewBox="0 0 72 48" aria-label="arcade mini">
+              <rect x="8" y="12" width="56" height="20" rx="4" fill="#c9f4d7" stroke="#7bdff6"/>
+              <rect x="14" y="16" width="44" height="b" rx="2" fill="#fff"/>
+              <circle cx="28" cy="22" r="2" fill="#333"/>
+              <circle cx="44" cy="22" r="2" fill="#333"/>
+            </svg>
+          </div>
+          <h3>Arcade Minis</h3>
+          <p class="section-sub" style="margin:0 0 8px;">Pocket-size retro fun, ready to plug and play.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catalog grid -->
+    <section aria-labelledby="catalog-title" style="margin-top: 60px;" id="catalog-grid">
+      <h2 class="section-title" id="catalog-title" style="text-align:center;">Shop the Catalog</h2>
+      <p class="section-sub" style="text-align:center; margin-bottom: 18px;">New stock weekly. Nostalgia with a pastel twist.</p>
+
+      <div class="grid" style="grid-template-columns: repeat(4, 1fr);" id="catalog-grid-inner">
+        <!-- Card 1 -->
+        <article class="card" aria-label="Pixel Quest Cartridge">
+          <div class="image" aria-label="Pixel Quest cartridge image">
+            <svg width="120" height="80" viewBox="0 0 120 80" aria-label="pixel quest">
+              <rect x="10" y="18" width="100" height="40" rx="6" fill="#fbd3e3" stroke="#f2a7c8"/>
+              <rect x="18" y="24" width="12" height="12" rx="2" fill="#fff"/>
+              <rect x="32" y="24" width="12" height="12" rx="2" fill="#fff"/>
+              <rect x="46" y="24" width="12" height="12" rx="2" fill="#fff"/>
+              <rect x="60" y="24" width="12" height="12" rx="2" fill="#fff"/>
+              <rect x="74" y="24" width="12" height="12" rx="2" fill="#fff"/>
+              <rect x="88" y="24" width="12" height="12" rx="2" fill="#fff"/>
+              <rect x="18" y="46" width="64" height="2" rx="1" fill="#fda8c9"/>
+            </svg>
+          </div>
+          <h3>Pixel Quest Cartridge</h3>
+          <p class="section-sub" style="margin:0 0 6px;">Classic platformer revival with a soft pastel touch.</p>
+          <div class="price">$29.99</div>
+          <button class="add" style="background: linear-gradient(135deg, #ffd0e6, #e5ffd9);" aria-label="Add Pixel Quest Cartridge to cart">Add to Cart</button>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="card" aria-label="Neon Knight Cartridge">
+          <div class="image" aria-label="Neon Knight cartridge image">
+            <svg width="120" height="80" viewBox="0 0 120 80" aria-label="neon knight">
+              <rect x="8" y="18" width="104" height="44" rx="8" fill="#d6f0ff" stroke="#a0e0ff"/>
+              <circle cx="38" cy="40" r="8" fill="#fff"/>
+              <circle cx="60" cy="40" r="8" fill="#fff"/>
+              <circle cx="82" cy="40" r="8" fill="#fff"/>
+              <rect x="16" y="54" width="88" height="6" rx="3" fill="#ffd9c9"/>
+            </svg>
+          </div>
+          <h3>Neon Knight Cartridge</h3>
+          <p class="section-sub" style="margin:0 0 6px;">Chivalry, colors, and chiptune tunes bundled in pastel packaging.</p>
+          <div class="price">$27.50</div>
+          <button class="add" style="background: linear-gradient(135deg, #fbd3e9, #d6ffd5);" aria-label="Add Neon Knight Cartridge to cart">Add to Cart</button>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="card" aria-label="Flower Field Arcade Mini">
+          <div class="image" aria-label="Flower Field Arcade image">
+            <svg width="120" height="80" viewBox="0 0 120 80" aria-label="flower field">
+              <rect x="8" y="18" width="104" height="44" rx="8" fill="#ffd4f0" stroke="#f7a8c7"/>
+              <circle cx="40" cy="40" r="6" fill="#fff"/>
+              <circle cx="60" cy="40" r="6" fill="#fff"/>
+              <circle cx="80" cy="40" r="6" fill="#fff"/>
+              <rect x="16" y="58" width="88" height="6" rx="3" fill="#fff"/>
+            </svg>
+          </div>
+          <h3>Flower Field Arcade</h3>
+          <p class="section-sub" style="margin:0 0 6px;">Short arcade sessions with a whimsical floral label.</p>
+          <div class="price">$19.99</div>
+          <button class="add" style="background: linear-gradient(135deg, #ffe6eb, #e2ffd8);" aria-label="Add Flower Field Arcade to cart">Add to Cart</button>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="card" aria-label="Retro Mini Console">
+          <div class="image" aria-label="Retro mini console image">
+            <svg width="120" height="80" viewBox="0 0 120 80" aria-label="retro mini">
+              <rect x="12" y="14" width="96" height="46" rx="8" fill="#cde8ff" stroke="#9bd0ff"/>
+              <rect x="20" y="20" width="80" height="30" rx="4" fill="#fff"/>
+              <circle cx="80" cy="40" r="6" fill="#fff" />
+            </svg>
+          </div>
+          <h3>Retro Mini Console</h3>
+          <p class="section-sub" style="margin:0 0 6px;">Tiny console, huge nostalgia. Perfect for shelves and stories.</p>
+          <div class="price">$39.99</div>
+          <button class="add" style="background: linear-gradient(135deg, #e8ffd8,#fbd3e6);" aria-label="Add Retro Mini Console to cart">Add to Cart</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section aria-labelledby="newsletter" style="margin-top: 56px;">
+      <div class="newsletter" id="newsletter" aria-label="Newsletter sign-up">
+        <div>
+          <h3 style="margin:0 0 6px; font-family:'Baloo 2', cursive;">Get the scoop on new drops</h3>
+          <p style="margin:0; color:var(--muted);">Join our pastel-pixel crew and receive monthly updates, exclusive offers, and tiny arcade wisdom.</p>
+        </div>
+        <form onsubmit="event.preventDefault(); alert('Thanks for joining the bouquet of retro goodness!')">
+          <input type="email" name="email" placeholder="Your email address" aria-label="Email address" required />
+          <button class="btn primary" style="width:100%; height:44px; border-radius:999px;" type="submit">Subscribe</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" id="contact" aria-label="Footer">
+    <p>© 2025 Bloom & Byte Retro Games • Made with pastel love</p>
+    <p style="margin:6px 0 0;">
+      Stay sweet: 
+      <a href="#" aria-label="Instagram" style="text-decoration:none; color:#7bdff6;">Instagram</a> • 
+      <a href="#" aria-label="Twitter" style="text-decoration:none; color:#7bdff6;">Twitter</a> • 
+      <a href="#" aria-label="Facebook" style="text-decoration:none; color:#7bdff6;">Facebook</a>
+    </p>
+  </footer>
+</body>
+</html>
